@@ -29,23 +29,19 @@ public class Client {
     }
 
     public void sendMessage() {
-        try {
-            broadcast(id);
-            broadcast(nickname);
 
-            while (socket.isConnected()) {
-                String message = scanner.nextLine();
-                if (!message.isBlank()) {
-                    if (message.startsWith("/")) {
-                        handleCommand(message);
-                    } else {
-                        broadcast(nickname + ": " + message);
-                    }
+        broadcast(id);
+        broadcast(nickname);
+
+        while (!socket.isClosed()) {
+            String message = scanner.nextLine();
+            if (!message.isBlank()) {
+                if (message.startsWith("/")) {
+                    handleCommand(message);
+                } else {
+                    broadcast(nickname + ": " + message);
                 }
             }
-
-        } catch (IOException e) {
-            closeEverything();
         }
     }
 
@@ -55,7 +51,7 @@ public class Client {
             public void run() {
                 String messageRecieved;
 
-                while (socket.isConnected()) {
+                while (!socket.isClosed()) {
                     try {
                         messageRecieved = bufferedReader.readLine();
                         System.out.println(messageRecieved);
@@ -77,7 +73,7 @@ public class Client {
         }
     }
 
-    public void handleCommand(String message) throws IOException {
+    public void handleCommand(String message) {
         String[] messageSplit = message.split(" ");
         String command = messageSplit[0];
         String[] args = new String[messageSplit.length - 1];
@@ -122,9 +118,9 @@ public class Client {
             if (socket != null) {
                 socket.close();
             }
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.exit(0);
     }
 }

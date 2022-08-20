@@ -12,8 +12,12 @@ public class Server {
     ServerSocket serverSocket;
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<ClientHandler>();
 
-    public Server(int port) throws IOException {
-        this.serverSocket = new ServerSocket(port);
+    public Server(int port) {
+        try {
+            this.serverSocket = new ServerSocket(port);
+        } catch (IOException e) {
+            closeServerSocket();
+        }
     }
 
     public void startServer() {
@@ -98,7 +102,6 @@ public class Server {
                     clientNickname = args[0];
                     break;
                 case "quit":
-                    System.out.println(clientNickname + " disconnected!");
                     removeClientHandler();
                     break;
                 case "list":
@@ -146,6 +149,7 @@ public class Server {
 
         public void removeClientHandler() {
             clientHandlers.remove(this);
+            System.out.println(clientNickname + " disconnected!");
             broadcast(clientNickname + " left the chat!");
         }
 
