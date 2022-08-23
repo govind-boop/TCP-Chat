@@ -81,7 +81,7 @@ public class Client {
             args[i] = messageSplit[i + 1];
         }
 
-        switch (command) {
+        switch (command.toLowerCase()) {
             case "/nick":
                 if (args.length == 1) {
                     broadcast(nickname + " changes their nickname to " + args[0]);
