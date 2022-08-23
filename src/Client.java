@@ -118,7 +118,6 @@ public class Client {
             if (socket != null) {
                 socket.close();
             }
-            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
         }

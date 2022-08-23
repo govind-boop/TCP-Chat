@@ -102,7 +102,7 @@ public class Server {
                     clientNickname = args[0];
                     break;
                 case "quit":
-                    removeClientHandler();
+                    shutdownClient();
                     break;
                 case "list":
                     ArrayList<String> nicknames = new ArrayList<String>();
