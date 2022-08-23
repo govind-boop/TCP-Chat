@@ -147,14 +147,10 @@ public class Server {
             }
         }
 
-        public void removeClientHandler() {
+        public void shutdownClient() {
             clientHandlers.remove(this);
             System.out.println(clientNickname + " disconnected!");
             broadcast(clientNickname + " left the chat!");
-        }
-
-        public void shutdownClient() {
-            removeClientHandler();
             try {
                 if (bufferedReader != null) {
                     bufferedReader.close();
