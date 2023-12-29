@@ -105,7 +105,11 @@ public class Server {
                     clientNickname = args[0];
                     break;
                 case "quit":
-                    shutdownClient();
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        shutdownClient();
+                    }
                     break;
                 case "list":
                     ArrayList<String> nicknames = new ArrayList<String>();
