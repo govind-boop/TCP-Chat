@@ -84,6 +84,9 @@ public class Server {
                 } catch (IOException e) {
                     shutdownClient();
                     break;
+                } catch (NullPointerException e) {
+                    shutdownClient();
+                    break;
                 }
             }
         }
