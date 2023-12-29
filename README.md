@@ -1,9 +1,10 @@
 # A TCP chat server/client
 
-A simple TCP chat app made in Java
+A multi-threaded TCP chat server and client made in Java
 
 ### How to use
-* Run the program with the command line argument "server" to start the server and "client" to run the server
+* Run the program with the command line
+* Input 'server' to start server, 'client' to start client or 'cancel' to quit
 
 ### Commands
 * /nick <new_nickname> - change nickname
