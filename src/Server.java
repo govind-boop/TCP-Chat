@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Scanner;
 
 public class Server {
     ServerSocket serverSocket;
@@ -17,21 +18,54 @@ public class Server {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             closeServerSocket();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid port");
         }
     }
 
-    public void startServer() {
-        System.out.println("Server Started!");
-        try {
-            while (!serverSocket.isClosed()) {
-                Socket socket = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(socket);
+    public void serverInput() {
+        Scanner scanner = new Scanner(System.in);
+        while (!serverSocket.isClosed()) {
+            handleServerCommand(scanner.nextLine());
+        }
+        scanner.close();
+    }
 
-                Thread thread = new Thread(clientHandler);
-                thread.start();
+    public void handleServerCommand(String message) {
+        String[] messageSplit = message.split(" ");
+        String command = messageSplit[0];
+        String[] args = new String[messageSplit.length - 1];
+        String argsString = "";
+        for (int i = 0; i < messageSplit.length - 1; i++) {
+            args[i] = messageSplit[i + 1];
+            argsString += messageSplit[i + 1];
+        }
+        switch (command) {
+            case "list":
+                for (ClientHandler clientHandler : clientHandlers) {
+                    System.out.println(clientHandler.clientNickname + " : " + clientHandler.clientId);
+                }
+                break;
+            case "say":    
+                serverBroadcast("SERVER: " + argsString);
+                break;
+            default:
+                System.out.println("Invalid Command!");
+                break;
+        }
+    }
+
+    public void serverBroadcast(String message) {
+        for (ClientHandler clientHandler : clientHandlers) {
+
+            try {
+                clientHandler.bufferedWriter.write(message);
+                clientHandler.bufferedWriter.newLine();
+                clientHandler.bufferedWriter.flush();
+            } catch (IOException e) {
+                clientHandler.shutdownClient();
             }
-        } catch (IOException e) {
-            closeServerSocket();
+
         }
     }
 
@@ -43,6 +77,29 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void clientListener() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (!serverSocket.isClosed())
+                        System.out.println("Server Started!");
+
+                    while (!serverSocket.isClosed()) {
+                        Socket socket = serverSocket.accept();
+                        ClientHandler clientHandler = new ClientHandler(socket);
+
+                        Thread thread = new Thread(clientHandler);
+                        thread.start();
+                    }
+                } catch (IOException e) {
+                    closeServerSocket();
+                }
+            }
+        }).start();
+
     }
 
     class ClientHandler implements Runnable {
@@ -77,7 +134,7 @@ public class Server {
                 try {
                     message = bufferedReader.readLine();
                     if (message.startsWith("#srvCommand ")) {
-                        handleServerCommand(message);
+                        handleClientCommand(message);
                     } else {
                         broadcast(message);
                     }
@@ -91,7 +148,7 @@ public class Server {
             }
         }
 
-        public void handleServerCommand(String message) {
+        public void handleClientCommand(String message) {
             String[] messageSplit = message.split(" ");
             String command = messageSplit[1];
             String[] args = new String[messageSplit.length - 2];

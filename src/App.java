@@ -1,3 +1,4 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class App {
@@ -27,21 +28,30 @@ public class App {
     public static void runServer() {
         System.out.println("Which port do you want to open the server in?");
         Scanner scanner = new Scanner(System.in);
-        int port = scanner.nextInt();
-        Server server = new Server(port);
-        scanner.close();
-        server.startServer();
+        try {
+            int port = scanner.nextInt();
+            Server server = new Server(port);
+            server.clientListener();
+            server.serverInput();
+            scanner.close();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid Port");
+        }
     }
 
     public static void runClient() {
         System.out.println("What is the host/ip of the server?");
         Scanner scanner = new Scanner(System.in);
-        String host = scanner.nextLine();
-        System.out.println("What is the port of the server?");
-        int port = scanner.nextInt();
-        Client client = new Client(host, port);
-        client.recieveMessage();
-        client.sendMessage();
-        scanner.close();
+        try {
+            String host = scanner.nextLine();
+            System.out.println("What is the port of the server?");
+            int port = scanner.nextInt();
+            Client client = new Client(host, port);
+            client.recieveMessage();
+            client.sendMessage();
+            scanner.close();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid Input");
+        }
     }
 }

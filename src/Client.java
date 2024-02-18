@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -17,12 +18,19 @@ public class Client {
 
     public Client(String host, int port) {
         try {
-            this.socket = new Socket(host, port);
+            try {
+                this.socket = new Socket(host, port);
+            } catch (UnknownHostException e) {
+                System.out.println("Invalid host/port");
+            }
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             System.out.println("Enter your nickname for the groupchat: ");
             this.nickname = scanner.nextLine();
         } catch (IOException e) {
+            System.out.println("Couldn't connect to the server!");
+            closeEverything();
+        } catch (NullPointerException e) {
             System.out.println("Couldn't connect to the server!");
             closeEverything();
         }
@@ -50,15 +58,18 @@ public class Client {
             @Override
             public void run() {
                 String messageRecieved;
+                try {
 
-                while (!socket.isClosed()) {
-                    try {
-                        messageRecieved = bufferedReader.readLine();
-                        if (messageRecieved != null) {
-                            System.out.println(messageRecieved);
+                } catch (NullPointerException e) {
+                    while (!socket.isClosed()) {
+                        try {
+                            messageRecieved = bufferedReader.readLine();
+                            if (messageRecieved != null) {
+                                System.out.println(messageRecieved);
+                            }
+                        } catch (IOException err) {
+                            closeEverything();
                         }
-                    } catch (IOException e) {
-                        closeEverything();
                     }
                 }
             }
@@ -71,6 +82,8 @@ public class Client {
             bufferedWriter.newLine();
             bufferedWriter.flush();
         } catch (IOException e) {
+            closeEverything();
+        } catch (NullPointerException e) {
             closeEverything();
         }
     }
