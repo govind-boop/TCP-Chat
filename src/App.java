@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("Do you want to start the server or client? (type \"cancel\" if you want to quit)");
+        System.out.println("Do you want to start the server or client?");
         makeDecision();
     }
 
@@ -31,8 +31,7 @@ public class App {
         try {
             int port = scanner.nextInt();
             Server server = new Server(port);
-            server.clientListener();
-            server.serverInput();
+            server.startServer();
             scanner.close();
         } catch (InputMismatchException e) {
             System.out.println("Invalid Port");

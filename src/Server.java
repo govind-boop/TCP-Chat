@@ -23,6 +23,13 @@ public class Server {
         }
     }
 
+    public void startServer() {
+        ClientListener clientListener = new ClientListener();
+        Thread listeneThread = new Thread(clientListener);
+        listeneThread.start();
+        serverInput();
+    }
+
     public void serverInput() {
         Scanner scanner = new Scanner(System.in);
         while (!serverSocket.isClosed()) {
@@ -38,7 +45,7 @@ public class Server {
         String argsString = "";
         for (int i = 0; i < messageSplit.length - 1; i++) {
             args[i] = messageSplit[i + 1];
-            argsString += messageSplit[i + 1];
+            argsString += messageSplit[i + 1] + " ";
         }
         switch (command) {
             case "list":
@@ -46,7 +53,7 @@ public class Server {
                     System.out.println(clientHandler.clientNickname + " : " + clientHandler.clientId);
                 }
                 break;
-            case "say":    
+            case "say":
                 serverBroadcast("SERVER: " + argsString);
                 break;
             default:
@@ -79,27 +86,24 @@ public class Server {
         }
     }
 
-    public void clientListener() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (!serverSocket.isClosed())
-                        System.out.println("Server Started!");
+    class ClientListener implements Runnable {
+        @Override
+        public void run() {
+            try {
+                if (!serverSocket.isClosed())
+                    System.out.println("Server Started!");
 
-                    while (!serverSocket.isClosed()) {
-                        Socket socket = serverSocket.accept();
-                        ClientHandler clientHandler = new ClientHandler(socket);
+                while (!serverSocket.isClosed()) {
+                    Socket socket = serverSocket.accept();
+                    ClientHandler clientHandler = new ClientHandler(socket);
 
-                        Thread thread = new Thread(clientHandler);
-                        thread.start();
-                    }
-                } catch (IOException e) {
-                    closeServerSocket();
+                    Thread thread = new Thread(clientHandler);
+                    thread.start();
                 }
+            } catch (IOException e) {
+                closeServerSocket();
             }
-        }).start();
-
+        }
     }
 
     class ClientHandler implements Runnable {

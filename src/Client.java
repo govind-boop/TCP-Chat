@@ -60,7 +60,6 @@ public class Client {
                 String messageRecieved;
                 try {
 
-                } catch (NullPointerException e) {
                     while (!socket.isClosed()) {
                         try {
                             messageRecieved = bufferedReader.readLine();
@@ -71,6 +70,8 @@ public class Client {
                             closeEverything();
                         }
                     }
+                } catch (NullPointerException e) {
+                    closeEverything();
                 }
             }
         }).start();
